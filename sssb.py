@@ -1,6 +1,6 @@
 from time import sleep
 from contextlib import contextmanager
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -15,6 +15,7 @@ URL = "https://sssb.se/soka-bostad/sok-ledigt/lediga-bostader/?pagination=0&pagi
 def chrome_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
     driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=chrome_options)
     try:
         yield driver
@@ -31,7 +32,7 @@ def get_html(url: str, load_time_seconds: int = 5) -> str:
 
 @dataclass(frozen=True)
 class Listing:
-    url: str
+    url: str = field(hash=False, compare=False)
     apartment_type: str
     adress: str
     apartment_number: str
