@@ -53,6 +53,7 @@ def extract_int(text: str) -> int:
     digits = "0" + digits # 0 if text does not contain any digits
     return int(digits)
 
+
 def parse_raw_listing(raw_listing: BeautifulSoup) -> Listing:
     # URL and apartment type
     title_element = raw_listing.find(attrs={"class": "ObjektTyp"})
