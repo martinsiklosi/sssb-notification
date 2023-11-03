@@ -22,12 +22,14 @@ SLEEP_TIME_AFTER_EMAIL = 5
 def is_relevant(listing: Listing) -> bool:
     if "korridor" in listing.apartment_type.lower():
         return False
-    # if listing.rent > 9000:
-    #     return False    
-    # if "körsbärsvägen" in listing.adress.lower():
-    #     return True
-    # if listing.region.lower() in {"pax", "strix", "roslagstull"}:
-    #     return True
+    bad_regions = {
+        "flemingsberg", 
+        "birka", 
+        "lappkärrsberget", 
+        "kungshamra",
+    }
+    if listing.region.lower() in bad_regions:
+        return False
     return True
 
 
