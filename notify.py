@@ -20,7 +20,15 @@ SLEEP_TIME_AFTER_EMAIL = 5
 
 
 def is_relevant(listing: Listing) -> bool:
-    return "korridor" not in listing.apartment_type.lower()
+    if "korridor" in listing.apartment_type.lower():
+        return False
+    # if listing.rent > 9000:
+    #     return False    
+    # if "körsbärsvägen" in listing.adress.lower():
+    #     return True
+    # if listing.region.lower() in {"pax", "strix", "roslagstull"}:
+    #     return True
+    return True
 
 
 def notify(subject: str, contents: str) -> None:    
@@ -61,7 +69,7 @@ def main() -> None:
         print(f"Found {len(relevant_listings)} new relevant listings")
 
         for listing in relevant_listings:
-            subject = f"Ny lägenhet på {listing.adress}"
+            subject = f"[{listing.apartment_number}] {listing.apartment_type} @ {listing.adress}"
             contents = f"""
                 Typ: {listing.apartment_type}
                 Adress: {listing.adress}
