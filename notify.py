@@ -22,13 +22,9 @@ SLEEP_TIME_AFTER_EMAIL = 5
 def is_relevant(listing: Listing) -> bool:
     if "korridor" in listing.apartment_type.lower():
         return False
-    bad_regions = {
-        "flemingsberg", 
-        "birka", 
-        "lappkärrsberget", 
-        "kungshamra",
-    }
-    if listing.region.lower() in bad_regions:
+    if listing.square_meters <= 25:
+        return False
+    if not "1 rum" in listing.apartment_type.lower():
         return False
     return True
 
@@ -55,7 +51,23 @@ def save_listings(listings: Iterable[Listing]) -> None:
                              for listing in listings]
     with open(TRACKING_FILE, "w") as file:
         json.dump(serializable_listings, file, indent=4)
-        
+
+
+def send_notification(listing: Listing) -> None:
+    subject = f"[{listing.apartment_number}] {listing.apartment_type} @ {listing.adress}"
+    contents = f"""
+        Typ: {listing.apartment_type}
+        Adress: {listing.adress}
+        Lägenhets nr: {listing.apartment_number}
+        Område: {listing.region}
+        Våning: {listing.floor}
+        Yta: {listing.square_meters} m²
+        Hyra: {listing.rent} kr
+        Inflytt: {listing.move_in_date}
+        URL: {listing.url}
+        """.replace("   ", "").strip()
+    notify(subject, contents)
+
         
 def main() -> None:
     try:
@@ -71,19 +83,7 @@ def main() -> None:
         print(f"Found {len(relevant_listings)} new relevant listings")
 
         for listing in relevant_listings:
-            subject = f"[{listing.apartment_number}] {listing.apartment_type} @ {listing.adress}"
-            contents = f"""
-                Typ: {listing.apartment_type}
-                Adress: {listing.adress}
-                Lägenhets nr: {listing.apartment_number}
-                Område: {listing.region}
-                Våning: {listing.floor}
-                Yta: {listing.square_meters} m²
-                Hyra: {listing.rent} kr
-                Inflytt: {listing.move_in_date}
-                URL: {listing.url}
-                """.replace("   ", "").strip()
-            notify(subject, contents)
+            send_notification(listing)
             print(f" - {listing.apartment_type} @ {listing.adress}")
 
         save_listings(all_listings)
